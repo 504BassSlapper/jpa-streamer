@@ -1,15 +1,12 @@
 package org.quark.app.org.quark.app.controller;
 
 import jakarta.inject.Inject;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.quark.app.model.Film;
+import org.quark.app.org.quark.app.utils.Converter;
 import org.quark.app.repository.FilmRepository;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -45,8 +42,9 @@ public class FilmController {
     @GET
     @Path("actors/{filmNameStartWith}")
     @Produces(MediaType.TEXT_PLAIN)
-    public String getActors(String filmNameStartWith) {
-        return filmRepository.getActors(filmNameStartWith)
+    public String getActors(@QueryParam("filmNameStartWith") @DefaultValue("") String filmNameStartWith) {
+
+        return filmNameStartWith.isBlank() ? "No criteria to search film" : filmRepository.getAllActorsFromFilm(filmNameStartWith)
                 .map(film -> String.format("%s (%d) %s"
                         , film.getTitle()
                         , film.getLength()
@@ -54,5 +52,17 @@ public class FilmController {
                                 .map(actor -> String.format("%s %s", actor.getFirstName(),
                                         actor.getLastName())).collect(Collectors.joining(" - "))
                 )).collect(Collectors.joining("\n"));
+    }
+
+    @GET
+    @Path("update/{minLength}/{rentalRate}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String updateRentalRate(short minLength, Float rentalRate) {
+        filmRepository.updateFilmsRate(minLength, rentalRate);
+        return filmRepository.getUpdatedFilms(minLength)
+                .map(movie -> String.format("%s ( %d min ) %s ", movie.getTitle(),
+                        movie.getLength(),
+                        Converter.decimafloatToDecimal(movie.getRentalRate())))
+                .collect(Collectors.joining("\n-"));
     }
 }
