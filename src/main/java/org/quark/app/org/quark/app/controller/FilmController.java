@@ -41,4 +41,18 @@ public class FilmController {
         return filmRepository.getFilms(page, minLength).map(s -> String.format("%s (%d min)", s.getTitle(), s.getLength()))
                 .collect(Collectors.joining("\n"));
     }
+
+    @GET
+    @Path("actors/{filmNameStartWith}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getActors(String filmNameStartWith) {
+        return filmRepository.getActors(filmNameStartWith)
+                .map(film -> String.format("%s (%d) %s"
+                        , film.getTitle()
+                        , film.getLength()
+                        , film.getActors().stream()
+                                .map(actor -> String.format("%s %s", actor.getFirstName(),
+                                        actor.getLastName())).collect(Collectors.joining(" - "))
+                )).collect(Collectors.joining("\n"));
+    }
 }
