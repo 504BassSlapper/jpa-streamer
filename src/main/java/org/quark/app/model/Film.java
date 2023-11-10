@@ -22,6 +22,7 @@ public class Film {
         this.length = length;
     }
 
+
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "film_id")

@@ -2,21 +2,35 @@ package org.quark.app.repository;
 
 
 import com.speedment.jpastreamer.application.JPAStreamer;
+import com.speedment.jpastreamer.projection.Projection;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.quark.app.model.EntityFilmManager;
+import org.quark.app.model.Film$;
 import org.quark.app.model.Film;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @ApplicationScoped
 public class FilmRepository {
+
+    public static final int PAGE_SIZE = 12;
+
     @Inject
     JPAStreamer jpaStreamer;
 
-    public Optional<Film> getFilm(short filmId){
+    public Optional<Film> getFilm(short filmId) {
         return jpaStreamer.stream(Film.class)
-                .filter(EntityFilmManager.filmId.equal(filmId))
+                .filter(Film$.filmId.equal(filmId))
                 .findFirst();
+    }
+
+    public Stream<Film> getFilms(long page, short minlength) {
+
+        return jpaStreamer.stream(Projection.select(Film$.filmId, Film$.title, Film$.length))
+                .filter(Film$.length.lessThan(minlength))
+                .sorted(Film$.length)
+                .skip(page * PAGE_SIZE)
+                .limit(PAGE_SIZE);
     }
 }
