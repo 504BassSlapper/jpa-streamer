@@ -81,10 +81,7 @@
         <version>${compiler-plugin.version}</version>
         <configuration>
           <compilerArgs>
-            <arg>-AjpaStreamerPackage=org.quark.app.model</arg>
-            <arg>-AjpaStreamerPrefix=Entity</arg>
-            <arg>-AjpaStreamerSuffix=Manager</arg>
-<!--            <arg>-parameters</arg>-->
+            <arg>-parameters</arg>
           </compilerArgs>
         </configuration>
       </plugin>
